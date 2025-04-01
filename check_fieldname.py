@@ -7,6 +7,7 @@ from browser_use import Agent
 from pydantic import BaseModel, SecretStr
 import os
 from dotenv import load_dotenv
+from playwright.sync_api import sync_playwright
  
 task_1 = """"
 - Step 1: Open [IoTPortal](https://web.test.iotportal.com).
@@ -67,7 +68,7 @@ agent = Agent(
 )
  
  
-async def main():
+async def test_main():
     await agent.run()
  
     # Close the browser context and browser
@@ -75,7 +76,7 @@ async def main():
     await browser.close()
  
  
-asyncio.run(main())
+asyncio.run(test_main())
  
 
  

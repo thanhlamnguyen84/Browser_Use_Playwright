@@ -1,5 +1,6 @@
 import asyncio
- 
+
+from browser_use.controller.service import Controller
 from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext, BrowserContextConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -7,15 +8,13 @@ from browser_use import Agent
 from pydantic import BaseModel, SecretStr
 import os
 from dotenv import load_dotenv
+import json
+import warnings
  
 task_1 = """"
 - Step 1: Open [IoTPortal](https://web.test.iotportal.com).
-- Step 2: Verify there are 5 links: About, Term Of Service (2 links), Privacy Policy (2 links)
-- Step 3: Verify there is  the field name "username123"
-- Step 3: Click on About link
-- Step 4: Verify it opens the new web tab: "https://brtsys.com/iotportal/"
-- Step 5: Click on "Term Of Service" link on the left 
-- Step 6: Verify it opens the new web tab: "https://brtsys.com/terms-of-service/"
+- Step 2: Get the label of field name and login agreement of all page
+
 """
  
 # Load the environment variables
@@ -53,7 +52,14 @@ browser_context_config = BrowserContextConfig(
     save_recording_path=os.path.join(project_root, 'exports', 'recordings'),
     trace_path=os.path.join(project_root, 'exports', 'traces')
 )
- 
+
+class ExtractResults(BaseModel):
+    first_label_field_name: str
+    second_label_field_name: str
+    login_agreement: str
+
+controller = Controller(output_model=ExtractResults)
+
 # Create browser context with the BrowserContextConfig
 browser_context = BrowserContext(
     browser=browser,
@@ -66,19 +72,29 @@ llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", api_key=SecretStr(os.
 agent = Agent(
     task=task_1,
     llm=llm,
-    browser_context=browser_context
+    browser_context=browser_context,
+    controller=controller
 )
  
  
-async def main():
-    await agent.run()
- 
+async def test_main():
+    history = await agent.run()
+
+    result = history.final_result()  # Lấy kết quả cuối cùng
+
+    result_dict = json.loads(result)  # Chuyển đổi chuỗi JSON thành dictionary
+    print(f"\nKết qua got: {result_dict["first_label_field_name"]}")
+    print(f"\nKết qua got: {result_dict["second_label_field_name"]}")
+    print(f"\nKết qua got: {result_dict["login_agreement"]}")
+    assert "Email / Mobile Number" in result_dict["first_label_field_name"]
+    assert "Password" in result_dict["second_label_field_name"]
+    assert "By logging into an account, you are agreeing with our Terms of Service and Privacy Policy and you confirm that you are above 13 years of age." in result_dict["login_agreement"]
+
     # Close the browser context and browser
     await browser_context.close()
     await browser.close()
- 
- 
-asyncio.run(main())
+
+asyncio.run(test_main())
  
 
  
