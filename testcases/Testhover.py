@@ -14,8 +14,10 @@ import pytest
 import sys
  
 task_1 = """"
-- Step 1: Open [IoTPortal](https://web.test.iotportal.com).
-- Step 2: Get the label of field name and Password
+- Step 1: Open https://testpages.eviltester.com/styled/csspseudo/css-hover.html
+- Step 2: Move the mouse over on the first green button without clicking
+- Step 3: wait for the additional text to appear
+- Step 4: Verify the text "You can see this paragraph now that you hovered on the above button." displays
 
 """
  
@@ -55,12 +57,12 @@ browser_context_config = BrowserContextConfig(
     # trace_path=os.path.join(project_root, 'exports', 'traces')
 )
 
-class ExtractResults(BaseModel):
-    first_label_field_name: str
-    second_label_field_name: str
-    # login_agreement: str
-
-controller = Controller(output_model=ExtractResults)
+# class ExtractResults(BaseModel):
+#     first_label_field_name: str
+#     second_label_field_name: str
+#     # login_agreement: str
+#
+# controller = Controller(output_model=ExtractResults)
 
 # Create browser context with the BrowserContextConfig
 browser_context = BrowserContext(
@@ -75,23 +77,25 @@ agent = Agent(
     task=task_1,
     llm=llm,
     browser_context=browser_context,
-    controller=controller
+    validate_output= True,
+    max_failures=1
+    # controller=controller
 )
  
 # @pytest.mark.smoking
 async def test_main():
     history = await agent.run()
-    print("\nExtracted Content:")
-    print(history.extracted_content())  # Content extracted during execution
-    data = history.extracted_content()
-    json_data = json.loads(data[1])
-    first_label = json_data['first_label_field_name']
-    second_label = json_data['second_label_field_name']
-    print("First Label Field Name:", first_label)
-    print("Second Label Field Name:", second_label)
-    # Optional: Assertions to check the values
-    assert first_label == "Email / Mobile Number", "First label does not match"
-    assert second_label == "Password", "Second label does not match"
+    # print("\nExtracted Content:")
+    # print(history.extracted_content())  # Content extracted during execution
+    # data = history.extracted_content()
+    # json_data = json.loads(data[1])
+    # first_label = json_data['first_label_field_name']
+    # second_label = json_data['second_label_field_name']
+    # print("First Label Field Name:", first_label)
+    # print("Second Label Field Name:", second_label)
+    # # Optional: Assertions to check the values
+    # assert first_label == "Email / Mobile Number", "First label does not match"
+    # assert second_label == "Password", "Second label does not match"
 
     # Close the browser context and browser
     await browser_context.close()

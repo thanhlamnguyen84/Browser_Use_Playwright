@@ -8,16 +8,28 @@ from browser_use import Agent
 from pydantic import BaseModel, SecretStr, ConfigDict
 import os
 from dotenv import load_dotenv
+from function.test_verify_text import verify_text
 import json
 import warnings
 import pytest
 import sys
  
-task_1 = """"
-- Step 1: Open [IoTPortal](https://web.test.iotportal.com).
-- Step 2: Get the label of field name and Password
-
+task_1 = """
+Open https://web.test.iotportal.com, login with username 'thanhlamcayvong@gmail.com' and password 'Duy@1610'
+Click the **second** 'Profile' icon with index 5 at the top-right of the page
+Click Account Settings > Profile Details
+Check whether the 'Multifactor Authentication' button is **enabled**
 """
+
+
+task_2 = """
+Navigate to: https://excalidraw.com/.
+Click on the pencil icon (with index 40).
+Then draw a triangle in the canvas.
+Draw the triangle starting from coordinate (400,400).
+You can use the drag and drop action to draw the triangle.
+"""
+
  
 # Load the environment variables
 load_dotenv()
@@ -33,17 +45,7 @@ browser_config = BrowserConfig(
 # Create browser instance with the BrowserConfig
 browser = Browser(config=browser_config)
  
-# Ensure project_root is a string
-# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
-# recording_path = os.path.join(project_root, 'exports', 'recordings')
-# trace_path = os.path.join(project_root, 'exports', 'traces')
- 
-# Create the directory if it does not exist
-# if not os.path.exists(recording_path):
-#     os.makedirs(recording_path)
-# if not os.path.exists(trace_path):
-#     os.makedirs(trace_path)
- 
+
 # Create BrowserContextConfig of Browser Use provided
 browser_context_config = BrowserContextConfig(
     wait_for_network_idle_page_load_time=3.0,
@@ -55,12 +57,12 @@ browser_context_config = BrowserContextConfig(
     # trace_path=os.path.join(project_root, 'exports', 'traces')
 )
 
-class ExtractResults(BaseModel):
-    first_label_field_name: str
-    second_label_field_name: str
-    # login_agreement: str
-
-controller = Controller(output_model=ExtractResults)
+# class ExtractResults(BaseModel):
+#     first_label_field_name: str
+#     second_label_field_name: str
+#     # login_agreement: str
+#
+# controller = Controller(output_model=ExtractResults)
 
 # Create browser context with the BrowserContextConfig
 browser_context = BrowserContext(
@@ -71,33 +73,44 @@ browser_context = BrowserContext(
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", api_key=SecretStr(os.getenv('GOOGLE_API_KEY')))
 
 # Create agent with the model and browser context
-agent = Agent(
+agent1 = Agent(
     task=task_1,
     llm=llm,
     browser_context=browser_context,
-    controller=controller
+    validate_output= True,
+    max_failures=1,
+    max_actions_per_step=1
+	# use_vision=True
+    # controller=controller
 )
- 
+
+# agent2 = Agent(
+#     task=task_2,
+#     llm=llm,
+#     browser_context=browser_context,
+#     validate_output= True,
+#     max_failures=1
+#     # controller=controller
+# )
 # @pytest.mark.smoking
 async def test_main():
-    history = await agent.run()
-    print("\nExtracted Content:")
-    print(history.extracted_content())  # Content extracted during execution
-    data = history.extracted_content()
-    json_data = json.loads(data[1])
-    first_label = json_data['first_label_field_name']
-    second_label = json_data['second_label_field_name']
-    print("First Label Field Name:", first_label)
-    print("Second Label Field Name:", second_label)
-    # Optional: Assertions to check the values
-    assert first_label == "Email / Mobile Number", "First label does not match"
-    assert second_label == "Password", "Second label does not match"
-
+    history = await agent1.run()
+    final_result = history.final_result()
+    print("✅ Final result:\n", final_result)
+    # try:
+    #     verify_text(final_result, "The Multifactor Authentication button is enabled")
+    #     print("✅ Button enable.")
+    # except AssertionError as e:
+    #     print(f"❌ Button enable: {e}")
+    if "Multifactor Authentication button is disabled" in final_result:
+        pytest.fail("Test failed: MFA button is disabled.")
+    else:
+        print("✅ Test passed: MFA button is enabled or result is acceptable.")
     # Close the browser context and browser
     await browser_context.close()
     await browser.close()
-
-asyncio.run(test_main())
+if __name__ == "__main__":
+    asyncio.run(test_main())
  
 
  

@@ -75,7 +75,8 @@ agent = Agent(
     task=task_1,
     llm=llm,
     browser_context=browser_context,
-    controller=controller
+    controller=controller,
+    validate_output=True
 )
  
 # @pytest.mark.smoke

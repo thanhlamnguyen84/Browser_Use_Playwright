@@ -13,26 +13,20 @@ import warnings
 import pytest
 import sys
  
-task_1 = """"
-- Step 1: Open [IoTPortal](https://web.test.iotportal.com).
-- Step 2: Get the label of field name and Password
-
-"""
+task = 'Find the founders of browser-use and draft them a short personalized message'
  
 # Load the environment variables
 load_dotenv()
  
 # Create BrowserConfig of Browser Use provided
-browser_config = BrowserConfig(
-    headless=False,
-    disable_security=True
+browser_config = BrowserConfig(headless=False,disable_security=True
     # chrome_instance_path=r"C:\Program Files\Mozilla Firefox\firefox.exe"
     # chrome_instance_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 )
  
 # Create browser instance with the BrowserConfig
 browser = Browser(config=browser_config)
- 
+controller = Controller()
 # Ensure project_root is a string
 # project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
 # recording_path = os.path.join(project_root, 'exports', 'recordings')
@@ -55,12 +49,12 @@ browser_context_config = BrowserContextConfig(
     # trace_path=os.path.join(project_root, 'exports', 'traces')
 )
 
-class ExtractResults(BaseModel):
-    first_label_field_name: str
-    second_label_field_name: str
-    # login_agreement: str
-
-controller = Controller(output_model=ExtractResults)
+# class ExtractResults(BaseModel):
+#     first_label_field_name: str
+#     second_label_field_name: str
+#     # login_agreement: str
+#
+# controller = Controller(output_model=ExtractResults)
 
 # Create browser context with the BrowserContextConfig
 browser_context = BrowserContext(
@@ -72,26 +66,20 @@ llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", api_key=SecretStr(os.
 
 # Create agent with the model and browser context
 agent = Agent(
-    task=task_1,
+    task=task,
     llm=llm,
     browser_context=browser_context,
+    validate_output= True,
+    max_failures=1,
     controller=controller
 )
  
 # @pytest.mark.smoking
 async def test_main():
-    history = await agent.run()
-    print("\nExtracted Content:")
-    print(history.extracted_content())  # Content extracted during execution
-    data = history.extracted_content()
-    json_data = json.loads(data[1])
-    first_label = json_data['first_label_field_name']
-    second_label = json_data['second_label_field_name']
-    print("First Label Field Name:", first_label)
-    print("Second Label Field Name:", second_label)
-    # Optional: Assertions to check the values
-    assert first_label == "Email / Mobile Number", "First label does not match"
-    assert second_label == "Password", "Second label does not match"
+    await agent.run()
+    new_task = 'Find an image of the founders'
+    agent.add_new_task(new_task)
+    await agent.run()
 
     # Close the browser context and browser
     await browser_context.close()

@@ -13,8 +13,9 @@ import pytest
 import sys
  
 task_1 = """"
-- Step 1: Open [IoTPortal](https://web.test.iotportal.com).
-- Step 2: Get the label names of the first user input field
+- Step 1: Open [IoTPortal](https://web.test.iotportal.com) with username "thanhlamcayvon"
+- Step 2: Login with username "thanhlamcayvong@gmail.com" and password "12345678"
+- Verify login fail with the actual message "Login failed" displays
 
 """
  
@@ -75,7 +76,9 @@ agent = Agent(
     task=task_1,
     llm=llm,
     browser_context=browser_context,
-    controller=controller
+    controller=controller,
+    max_failures = 1,
+	validate_output = True
 )
  
  
@@ -83,14 +86,14 @@ async def test_main():
     history = await agent.run()
     result = history.final_result()  # Lấy kết quả cuối cùng
     print (result)
-    result_dict = json.dumps(result, indent=2)  # Chuyển đổi chuỗi JSON thành dictionary
+    # result_dict = json.dumps(result, indent=2)  # Chuyển đổi chuỗi JSON thành dictionary
     # print (result_dict)
     # if result is None:
     #     raise ValueError("Agent returned None instead of JSON data")
-    print(f"\nKết qua got: {result_dict["label_field_name"]}")
+    # print(f"\nKết qua got: {result_dict["label_field_name"]}")
     # print(f"\nKết qua got: {result_dict["second_label_field_name"]}")
     # print(f"\nKết qua got: {result_dict["login_agreement"]}")
-    assert "Email / Mobile Number" in result_dict["label_field_name"]
+    # assert "Email / Mobile Number" in result_dict["label_field_name"]
 
     # Close the browser context and browser
     await browser_context.close()

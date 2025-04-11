@@ -77,7 +77,15 @@ agent = Agent(
     browser_context=browser_context,
     controller=controller
 )
- 
+# def validate_labels(first_label, second_label):
+#     try:
+#         assert first_label == "123456", "First label does not match"
+#         assert second_label == "658445665", "Second label does not match"
+#         print("Test Passed")  # Only prints if both assertions pass
+#     except AssertionError:
+#         print("Test Failed")  # Prints when any assertion fails
+
+
 # @pytest.mark.smoking
 async def test_main():
     history = await agent.run()
@@ -90,9 +98,9 @@ async def test_main():
     print("First Label Field Name:", first_label)
     print("Second Label Field Name:", second_label)
     # Optional: Assertions to check the values
-    assert first_label == "Email / Mobile Number", "First label does not match"
-    assert second_label == "Password", "Second label does not match"
-
+    assert first_label == "11Email / Mobile Number", "First label does not match.Test Failed"
+    assert second_label == "11Password", "Second label does not match.Test Failed"
+    # validate_labels("WrongLabel", "TestPassword")  # This will print "Test Failed"
     # Close the browser context and browser
     await browser_context.close()
     await browser.close()
