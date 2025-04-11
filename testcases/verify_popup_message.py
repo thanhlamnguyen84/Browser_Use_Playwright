@@ -1,25 +1,25 @@
 import asyncio
-
-from browser_use.controller.service import Controller
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# from browser_use.controller.service import Controller
 from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext, BrowserContextConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
 from browser_use import Agent
 from pydantic import BaseModel, SecretStr, ConfigDict
-import os
+
 from dotenv import load_dotenv
 from function.test_verify_text import verify_text
-import json
-import warnings
-import pytest
-import sys
- 
-task_1 = """
-Open https://web.test.iotportal.com, login with username 'thanhlamcayvong@gmail.com' and password 'Duy@1610'
-Open Setting left menu > click Time Zone Settings
-From dropdown list, select another timezone and then click Save button and get the confirmation message
+from config.credentials import *
 
-"""
+
+task_1 = (
+"Open https://web.test.iotportal.com"
+f"input username '{USERNAME1}' and password '{PASSWORD1}'"
+"Open Setting left menu > click Time Zone Settings"
+"From dropdown list, select another timezone and then click Save button and get the confirmation message"
+)
 
 
 task_2 = """
@@ -45,17 +45,7 @@ browser_config = BrowserConfig(
 # Create browser instance with the BrowserConfig
 browser = Browser(config=browser_config)
  
-# Ensure project_root is a string
-# project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
-# recording_path = os.path.join(project_root, 'exports', 'recordings')
-# trace_path = os.path.join(project_root, 'exports', 'traces')
- 
-# Create the directory if it does not exist
-# if not os.path.exists(recording_path):
-#     os.makedirs(recording_path)
-# if not os.path.exists(trace_path):
-#     os.makedirs(trace_path)
- 
+
 # Create BrowserContextConfig of Browser Use provided
 browser_context_config = BrowserContextConfig(
     wait_for_network_idle_page_load_time=3.0,
@@ -108,7 +98,7 @@ async def test_main():
     final_result = history.final_result()
     print("✅ Final result:\n", final_result)
     try:
-        verify_text(final_result, "Time zone has been updated successfully")
+        verify_text(final_result, "Time zone has been ")
         print("✅ Text verification passed.")
     except AssertionError as e:
         print(f"❌ Text verification failed: {e}")

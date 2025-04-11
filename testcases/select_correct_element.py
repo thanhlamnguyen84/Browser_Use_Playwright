@@ -1,25 +1,26 @@
 import asyncio
-
-from browser_use.controller.service import Controller
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext, BrowserContextConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
 from browser_use import Agent
 from pydantic import BaseModel, SecretStr, ConfigDict
-import os
+
 from dotenv import load_dotenv
-from function.test_verify_text import verify_text
-import json
-import warnings
+# from function.test_verify_text import verify_text
+from config.credentials import *
 import pytest
 import sys
  
-task_1 = """
-Open https://web.test.iotportal.com, login with username 'thanhlamcayvong@gmail.com' and password 'Duy@1610'
-Click the **second** 'Profile' icon with index 5 at the top-right of the page
-Click Account Settings > Profile Details
-Check whether the 'Multifactor Authentication' button is **enabled**
-"""
+task_1 = (
+"Open https://web.test.iotportal.com"
+f"input username '{USERNAME1}' and password '{PASSWORD1}'"
+"Click the **second** 'Profile' icon with index 5 at the top-right of the page"
+"Click Account Settings > Profile Details"
+"Check whether the 'Multifactor Authentication' button is **disable**"
+)
 
 
 task_2 = """
