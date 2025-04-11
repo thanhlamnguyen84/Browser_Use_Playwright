@@ -4,7 +4,7 @@ import asyncio
 from langchain_google_genai import ChatGoogleGenerativeAI
 from browser_use import Agent
 from pydantic import BaseModel, SecretStr, ConfigDict
-from agent.login_agent import run_login_flow
+from agent_browser.login_agent import run_login_flow
 import os
 from dotenv import load_dotenv
 from browser_use.browser.browser import Browser, BrowserConfig

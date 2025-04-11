@@ -70,7 +70,7 @@ browser_context = BrowserContext(
 # Initialize the model
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", api_key=SecretStr(os.getenv('GOOGLE_API_KEY')))
 
-# Create agent with the model and browser context
+# Create agent_browser with the model and browser context
 agent = Agent(
     task=task_1,
     llm=llm,
