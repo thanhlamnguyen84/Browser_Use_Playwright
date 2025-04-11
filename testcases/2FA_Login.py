@@ -5,12 +5,14 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from browser_use import Agent
 from pydantic import BaseModel, SecretStr, ConfigDict
 from agent_browser.login_agent import run_login_flow
+import sys
 import os
 from dotenv import load_dotenv
 from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext, BrowserContextConfig
 from config.credentials import USERNAME, PASSWORD
-
+# Dynamically add the project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # Load the environment variables
 load_dotenv()
 
@@ -47,7 +49,6 @@ browser_context = BrowserContext(
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", api_key=SecretStr(os.getenv('GOOGLE_API_KEY')))
 
 async def test_main():
-
     user = USERNAME
     password = PASSWORD
     await run_login_flow(browser_context, llm, user, password)
