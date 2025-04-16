@@ -3,14 +3,14 @@
 from function.get_2FA_code_Outlook import get_2fa_code_from_outlook
 from playwright.async_api import async_playwright
 import asyncio
-# from config.credentials import USERNAME
+from config.credentials import *
 async def run_login_flow(browser_context, llm, user, password):
     from browser_use.agent.service import Agent
     # Fetch 2FA code from Outlook
 
     agent1 = Agent(
         task=(
-            "go to https://web.test.iotportal.com, hit Forgot Password"
+            f"go to '{TEST_ADMIN_PORTAL_URL}' , hit Forgot Password"
             f"input username '{user}' and click Reset Password"
             "wait for Forgot Password page displays"
 
