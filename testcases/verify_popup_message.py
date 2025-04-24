@@ -98,7 +98,7 @@ async def test_main():
     final_result = history.final_result()
     print("✅ Final result:\n", final_result)
     try:
-        verify_text(final_result, "Time zone has been ")
+        verify_text(final_result, "Time zone has been updated successfully")
         print("✅ Text verification passed.")
     except AssertionError as e:
         print(f"❌ Text verification failed: {e}")
