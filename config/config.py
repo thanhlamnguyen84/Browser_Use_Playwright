@@ -2,7 +2,6 @@ import asyncio
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-# from browser_use.controller.service import Controller
 from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext, BrowserContextConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -35,7 +34,7 @@ browser_context_config = BrowserContextConfig(
     browser_window_size={'width': 1600, 'height': 900},
     locale='vi-VN',
     highlight_elements=True,
-    viewport_expansion=0
+    # viewport_expansion=0
     # save_recording_path=os.path.join(project_root, 'exports', 'recordings'),
     # trace_path=os.path.join(project_root, 'exports', 'traces')
 )
