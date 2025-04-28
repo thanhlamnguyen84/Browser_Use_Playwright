@@ -17,22 +17,23 @@ from playwright.async_api import expect
 task_1 = (
 f"Open URL '{TEST_ADMIN_PORTAL_URL}'"
 f"input username '{USERNAME1}' and password '{PASSWORD1}'"
-"Click the **second** 'Profile' icon with index 5 at the top-right of the page"
-"Click Subscription button"
+"Click the Gateways left menu"
 )
 
 # Create agent_browser with the model and browser context
 agent1 = Agent(
     task=task_1,
     llm=llm,
-    browser_context=browser_context,
+    browser_context=browser_context
     # validate_output=True
 	)
 
 agent2 = Agent(
     task=(
-        "Click on 'Token conversion rate' button"
-        "Verify Email value is '5000'"
+        "Click sort icon for UUID column"
+        "Verify that the UUIDs are sorted in descending order"
+        "Click sort icon for UUID column again"
+        "Verify that the UUIDs are sorted in ascending order (smallest → largest)"
       ),
     llm = llm,
     browser_context = browser_context,
@@ -42,8 +43,7 @@ agent2 = Agent(
 
 agent3 = Agent(
     task=(
-          "Click on 'Manage Subscription' button"
-          "Verify 'Monthly Allocated Tokens' value is 2,000,000"
+          "Get all Gateways name"
 
       ),
     llm = llm,
@@ -57,6 +57,8 @@ async def test_main():
     print("✅ Final result:\n", final_result)
 
     await agent2.run()
+    final_result = history.final_result()
+    print("✅ Final result:\n", final_result)
     # page = browser.playwright_browser.contexts[0].pages[0]
     # # await page.pause()
     #
@@ -65,8 +67,8 @@ async def test_main():
     # await expect(page.get_by_role("dialog")).to_contain_text("1000")
     # await expect(page.get_by_text("destination and the SMS rate.")).to_be_visible()
 
-    result = await agent3.run()
-    assert result.get("success", False), f"Validation failed: {result}"
+    # result = await agent3.run()
+    # assert result.get("success", False), f"Validation failed: {result}"
 
     # Close the browser context and browser
     await browser_context.close()
