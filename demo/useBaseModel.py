@@ -1,4 +1,3 @@
-
 import asyncio
 import os
 import sys
@@ -14,6 +13,8 @@ from config.config import *
 from function.test_verify_text import verify_text
 from playwright.async_api import expect
 from browser_use.controller.service import Controller
+from pydantic import BaseModel
+from typing import List
 
 
 task_1 = (
@@ -23,71 +24,68 @@ f"input username '{USERNAME1}' and password '{PASSWORD1}'"
 "Click Subscription button"
 )
 
-class ExtractResult(BaseModel):
-    email_value: int
-
 class ExtractResults(BaseModel):
-	posts: List[ExtractResult]
+    email_value: int
+    dashboard_Data_Request_value: int
+    data_Download_Request_value: int
+
 
 controller = Controller(output_model=ExtractResults)
 # Create agent_browser with the model and browser context
 agent1 = Agent(
     task=task_1,
     llm=llm,
-    browser_context=browser_context,
-    # validate_output=Tru
+    browser_context=browser_context
 	)
 
 agent2 = Agent(
     task=(
         "Click on 'Token conversion rate' button"
-        "Get the Email value"
+        "In Token Conversion Rate screen, Get Token Consumed values of Resources"
+        "Close the popup window"
       ),
     llm = llm,
     browser_context = browser_context,
-    validate_output=True,
-    max_failures = 1
-    # controller=controller
+    max_failures = 1,
+    controller=controller
 )
 
 agent3 = Agent(
     task=(
           "Click on 'Manage Subscription' button"
-          "Verify 'Monthly Allocated Tokens' value is 2,000,000"
+          "Verify 'Monthly Allocated Tokens' value is 3,000,000"
 
       ),
     llm = llm,
     browser_context = browser_context,
-    validate_output=True,
-    max_failures = 1
+    validate_output=True
+    # max_failures = 1
 )
 
 async def test_main():
-    history = await agent1.run()
+    await agent1.run()
     # final_result = history.final_result()
     # print("✅ Final result:\n", final_result)
 
     history1 = await agent2.run()
-    print("\nExtracted Content:")
-    print(history1.extracted_content())  # Content extracted during execution
-    data = history1.extracted_content()
-    json_data = json.loads(data)
-    value = json_data['email_value']
-    print("email_value:", value)
-    # print("Second Label Field Name:", second_label)
-    # Optional: Assertions to check the values
-    assert value == "2000", "First label does not match"
-    # assert second_label == "Password", "Second label does not match"
-    # page = browser.playwright_browser.contexts[0].pages[0]
-    # # await page.pause()
-    #
-    # await expect(page.get_by_role("dialog")).to_contain_text("10")
-    # await expect(page.get_by_role("dialog")).to_contain_text("3000 to 33000*")
-    # await expect(page.get_by_role("dialog")).to_contain_text("1000")
-    # await expect(page.get_by_text("destination and the SMS rate.")).to_be_visible()
+    result = history1.final_result()
+    result_dict = json.loads(result)
+    print(f"\nEmail value: {result_dict["email_value"]}")
+    print(f"\nData Request value: {result_dict["dashboard_Data_Request_value"]}")
+    print(f"\nData Download Request value: {result_dict["data_Download_Request_value"]}")
 
-    # result = await agent3.run()
-    # assert result.get("success", False), f"Validation failed: {result}"
+    assert "Email value: 1000" in f"Email value: {result_dict['email_value']}", \
+        f"Wrong number: expected '1000', got '{result_dict['email_value']}'"
+    assert "Data Request value: 2000" in f"Data Request value: {result_dict['dashboard_Data_Request_value']}", \
+        f"Wrong number: expected '2000', got '{result_dict['dashboard_Data_Request_value']}'"
+    assert "Data Download Request value: 1000" in f"Data Download Request value: {result_dict['data_Download_Request_value']}", \
+        f"Wrong number: expected '1000', got '{result_dict['data_Download_Request_value']}'"
+
+    history3 = await agent3.run()
+
+    if not history3.is_done():
+        pytest.fail(f"Incorrect value >> Test failed. Final result: {history3.final_result()}")
+
 
     # Close the browser context and browser
     await browser_context.close()

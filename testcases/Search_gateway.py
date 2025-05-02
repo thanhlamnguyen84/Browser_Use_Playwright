@@ -59,16 +59,10 @@ async def test_main():
     await agent2.run()
     final_result = history.final_result()
     print("✅ Final result:\n", final_result)
-    # page = browser.playwright_browser.contexts[0].pages[0]
-    # # await page.pause()
-    #
-    # await expect(page.get_by_role("dialog")).to_contain_text("10")
-    # await expect(page.get_by_role("dialog")).to_contain_text("3000 to 33000*")
-    # await expect(page.get_by_role("dialog")).to_contain_text("1000")
-    # await expect(page.get_by_text("destination and the SMS rate.")).to_be_visible()
 
-    # result = await agent3.run()
-    # assert result.get("success", False), f"Validation failed: {result}"
+    await agent3.run()
+    print("✅ Final result:\n", final_result)
+
 
     # Close the browser context and browser
     await browser_context.close()

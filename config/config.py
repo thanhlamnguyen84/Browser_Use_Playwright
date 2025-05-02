@@ -12,10 +12,11 @@ from dotenv import load_dotenv
 from function.test_verify_text import verify_text
 from config.credentials import *
 
+load_dotenv()
 # Initialize the model
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp", api_key=SecretStr(os.getenv('GOOGLE_API_KEY')))
 # Load the environment variables
-load_dotenv()
+
 
 # Create BrowserConfig of Browser Use provided
 browser_config = BrowserConfig(
@@ -31,7 +32,7 @@ browser = Browser(config=browser_config)
 # Create BrowserContextConfig of Browser Use provided
 browser_context_config = BrowserContextConfig(
     wait_for_network_idle_page_load_time=3.0,
-    browser_window_size={'width': 1600, 'height': 900},
+    browser_window_size={'width': 1450, 'height': 700},
     locale='vi-VN',
     highlight_elements=True,
     # viewport_expansion=0
@@ -44,4 +45,5 @@ browser_context_config = BrowserContextConfig(
 browser_context = BrowserContext(
     browser=browser,
     config=browser_context_config
+
 )
