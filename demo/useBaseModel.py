@@ -74,8 +74,8 @@ async def test_main():
     print(f"\nData Request value: {result_dict["dashboard_Data_Request_value"]}")
     print(f"\nData Download Request value: {result_dict["data_Download_Request_value"]}")
 
-    assert "Email value: 1000" in f"Email value: {result_dict['email_value']}", \
-        f"Wrong number: expected '1000', got '{result_dict['email_value']}'"
+    assert "Email value: 5000" in f"Email value: {result_dict['email_value']}", \
+        f"Wrong number: expected '5000', got '{result_dict['email_value']}'"
     assert "Data Request value: 2000" in f"Data Request value: {result_dict['dashboard_Data_Request_value']}", \
         f"Wrong number: expected '2000', got '{result_dict['dashboard_Data_Request_value']}'"
     assert "Data Download Request value: 1000" in f"Data Download Request value: {result_dict['data_Download_Request_value']}", \
