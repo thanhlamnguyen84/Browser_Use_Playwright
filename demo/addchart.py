@@ -54,10 +54,6 @@ async def test_main():
     await login_agent.run()
     print("Running test case iot_1234")
     await iot_1234.run()
-    # page = browser.playwright_browser.contexts[0].pages[0]
-    # await expect(page.locator("input[name=\"PH80XXRR0520218198722\\/3\\.chart_name\"]")).to_have_value("Energy Consumption");
-    # await expect(page.locator("[id=\"PH80XXRR0520218198723\\/0\"]").get_by_text("close")).to_be_visible()
-    # # await page.get_by_role("button", name="Create").click()
 
     # await page.pause()
     print("Running tear down")
