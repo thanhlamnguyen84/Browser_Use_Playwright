@@ -57,6 +57,7 @@ agent3 = Agent(
 async def test_main():
     print("\n...Setting up for the test")
     await agent1.run()
+
     print("Running the sort test")
     history2 = await agent2.run()
     result = history2.action_results()
@@ -76,7 +77,7 @@ async def test_main():
     assert action_result2 not in result_new, "❌ Test failed: wrong sort order"
     print("✅ Test sort ascending passed")
 
-    print("Running the sort test")
+    print("Running the filter test")
     history4=await agent3.run()
     result4 = history4.final_result()
     print("✅ Final result 4:\n", result4)

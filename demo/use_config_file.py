@@ -39,6 +39,7 @@ async def test_main():
 
     await agent.run()
     page = browser.playwright_browser.contexts[0].pages[0]
+    # await page.pause()
     expect(page.get_by_role("button", name="Europe/Zagreb (UTC +02:00)")).to_be_visible()
 
     await agent2.run()

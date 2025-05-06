@@ -36,41 +36,48 @@ browser_context = BrowserContext(
 # browser_context = BrowserContext(browser_context_config)
 login_agent, iot_001, iot_002, tear_down = get_agents(browser_context)
 
-# CLI option
-def pytest_addoption(parser):
-    parser.addoption(
-        "--test_case",
-        action="store",
-        default="",
-        help="Specify test case ID: iot_001 or iot_002. Leave empty to run all."
-    )
-
-@pytest.fixture
-def test_case_option(request):
-    return request.config.getoption("test_case")
 
 # Login and teardown fixture
-@pytest.fixture(scope="session", autouse=True)
-async def setup_teardown():
-    print("➡ Login agent setup")
-    await login_agent.run()
-    yield
-    print("⬅ Running tear down")
-    await tear_down.run()
-    await browser_context.close()
-    await browser.close()
+# @pytest.fixture(scope="session", autouse=True)
+# async def setup_teardown():
+#     print("➡ Login agent setup")
+#     await login_agent.run()
+#     yield
+#     print("⬅ Running tear down")
+#     await tear_down.run()
+#     await browser_context.close()
+#     await browser.close()
 
 # Test runner
+
 @pytest.mark.asyncio
-async def test_selected_case(test_case_option):
-    print("thu xem log")
-    if test_case_option == "iot_001":
-        print("➡ Running iot_001")
-        await iot_001.run()
-    elif test_case_option == "iot_002":
-        print("➡ Running iot_002")
-        await iot_002.run()
-    else:
-        print("⚠ No test_case specified. Running all tests...")
-        await iot_001.run()
-        await iot_002.run()
+async def test_case_dispatcher(test_case_option):
+    print(f"📌 test_case = '{test_case_option or '[empty]'}'")
+
+    print("➡ Setup (login_agent)")
+    await login_agent.run()
+
+    try:
+        if test_case_option == "iot_001":
+            print("▶ Running iot_001")
+            await iot_001.run()
+
+        elif test_case_option == "iot_002":
+            print("▶ Running iot_002")
+            await iot_002.run()
+
+        elif test_case_option == "":
+            print("⚠ No test_case specified → Running all cases")
+            print("▶ Running iot_001")
+            await iot_001.run()
+            print("▶ Running iot_002")
+            await iot_002.run()
+        else:
+            pytest.skip(f"❌ Invalid test_case ID: {test_case_option}")
+
+    finally:
+        print("⬅ Teardown (tear_down)")
+        await tear_down.run()
+        await browser_context.close()
+        await browser.close()
+
