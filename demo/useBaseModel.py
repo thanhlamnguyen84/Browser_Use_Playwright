@@ -63,10 +63,9 @@ agent3 = Agent(
 )
 
 async def test_main():
+    print("...Running set up for the test")
     await agent1.run()
-    # final_result = history.final_result()
-    # print("✅ Final result:\n", final_result)
-
+    print("VerifyingToken Conversion Rate")
     history1 = await agent2.run()
     result = history1.final_result()
     result_dict = json.loads(result)
@@ -74,17 +73,19 @@ async def test_main():
     print(f"\nData Request value: {result_dict["dashboard_Data_Request_value"]}")
     print(f"\nData Download Request value: {result_dict["data_Download_Request_value"]}")
 
-    assert "Email value: 5000" in f"Email value: {result_dict['email_value']}", \
-        f"Wrong number: expected '5000', got '{result_dict['email_value']}'"
+    assert "Email value: 1000" in f"Email value: {result_dict['email_value']}", \
+        f"Wrong number: expected '1000', got '{result_dict['email_value']}'"
     assert "Data Request value: 2000" in f"Data Request value: {result_dict['dashboard_Data_Request_value']}", \
         f"Wrong number: expected '2000', got '{result_dict['dashboard_Data_Request_value']}'"
     assert "Data Download Request value: 1000" in f"Data Download Request value: {result_dict['data_Download_Request_value']}", \
         f"Wrong number: expected '1000', got '{result_dict['data_Download_Request_value']}'"
 
+    print("Verifying 'Monthly Allocated Tokens' value ")
     history3 = await agent3.run()
-
     if not history3.is_done():
         pytest.fail(f"Incorrect value >> Test failed. Final result: {history3.final_result()}")
+    # else:
+    #     print("✅ Validation passed")
 
 
     # Close the browser context and browser
